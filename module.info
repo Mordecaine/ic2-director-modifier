@@ -1,0 +1,8 @@
+Name: Director Extension
+Version: 0.0.1
+Depends: director
+Description: Extends the functions of the Import- and Sync rules of the Icingaweb2 Director
+
+ This module requires:
+
+ * Icingaweb2 Director
