@@ -1,4 +1,4 @@
 <?php
-
-use Icinga\Module\Directorextension\ProvidedHook\Director\PropertyModifier\PropertyModifierRegexSearch;
-$this->provideHook('director/PropertyModifier', PropertyModifierRegexSearch::class);
+namespace Icinga\Module\Directorextension;
+use Icinga\Application\Modules\Module;
+$this->provideHook('director/PropertyModifier', Icinga\Module\Directorextension\ProvidedHook\Director\PropertyModifier\PropertyModifierRegexSearch);
