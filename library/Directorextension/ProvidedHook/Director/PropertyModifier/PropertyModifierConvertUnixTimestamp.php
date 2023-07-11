@@ -5,17 +5,18 @@ namespace Icinga\Module\Directorextension\ProvidedHook\Director\PropertyModifier
 use Icinga\Module\Director\Hook\PropertyModifierHook;
 use Icinga\Exception\ConfigurationError;
 use Icinga\Module\Director\Web\Form\QuickForm;
+use DateTime;
 
-class PropertyModifierRegexSearch extends PropertyModifierHook
+class PropertyModifierConvertUnixTimestamp extends PropertyModifierHook
 {
     public static function addSettingsFormFields(QuickForm $form)
     {
-        $form->addElement('text', 'pattern', array(
-            'label'       => 'Regex pattern',
+        $form->addElement('text', 'timestamp_format', array(
+            'label'       => 'Format',
             'description' => $form->translate(
-                'The pattern you want to search for. This can be a regular expression like /^www\d+\./'
+                'Define the syntax of the timestamp: https://www.php.net/manual/en/datetime.format.php. Default is d-m-Y H:i:s'
             ),
-            'required'    => true,
+            'required'    => false,
         ));
 
 
@@ -35,34 +36,29 @@ class PropertyModifierRegexSearch extends PropertyModifierHook
 
     }
 
-    public function getName()
-    {
-        return 'Regex Search';
-    }
-
     public function transform($value)
     {
-       preg_match(
-	   $this->getSetting('pattern'),
-	   $value,
-	   $regex_match
-       );
-
-       if ($regex_match === array()) {
-	   switch($this->getSetting('when_missing')) {
-	       case "null":
+       if (!isset($value)) {
+           switch($this->getSetting('when_missing')) {
+               case "null":
                    return null;
                case "empty_string":
                    return "";
-	       default:
+               default:
                    throw new ConfigurationError(
                        '"%s" do not match with "%s"',
-		       $this->getSetting('pattern'),
-		       $value
-	           );
+                       $this->getSetting('pattern'),
+                       $value
+                   );
            }
-       } else {
-           return $regex_match[0];
        }
+       $datetime = new DateTime();
+       $datetime->setTimestamp($value);
+
+       if (!isset($timestamp_format)) {
+           $timestamp_format = 'd-m-Y H:i:s';
+       }
+
+       return $datetime->format($timestamp_format);
     }
 }
