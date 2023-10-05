@@ -6,6 +6,7 @@ use Icinga\Module\Director\Hook\PropertyModifierHook;
 use Icinga\Exception\ConfigurationError;
 use Icinga\Module\Director\Web\Form\QuickForm;
 use DateTime;
+use DateTimeZone;
 
 class PropertyModifierConvertUnixTimestamp extends PropertyModifierHook
 {
@@ -16,9 +17,18 @@ class PropertyModifierConvertUnixTimestamp extends PropertyModifierHook
             'description' => $form->translate(
                 'Define the syntax of the timestamp: https://www.php.net/manual/en/datetime.format.php. Default is d-m-Y H:i:s'
             ),
+            'value'       => 'd-m-Y H:i:s',
             'required'    => false,
         ));
 
+        $form->addElement('text', 'timezone', array(
+            'label'       => 'GMT',
+            'description' => $form->translate(
+                'Define the Timezone. Default is +0200'
+            ),
+	    'value'	  => '+0200',
+            'required'    => false,
+        ));
 
 	$form->addElement('select', 'when_missing', [
             'label'       => $form->translate('When not available'),
@@ -52,13 +62,26 @@ class PropertyModifierConvertUnixTimestamp extends PropertyModifierHook
                    );
            }
        }
-       $datetime = new DateTime();
-       $datetime->setTimestamp($value);
+       $gmtOffset = $this->getSetting('timezone');
+       $timestamp_format = $this->getSetting('timestamp_format');
 
-       if (!isset($timestamp_format)) {
+       if (!isset($timestamp_format) or $timestamp_format == '') {
            $timestamp_format = 'd-m-Y H:i:s';
        }
 
-       return $datetime->format($timestamp_format);
+       if (!isset($gmtOffset) or $gmtOffset == '') {
+           $gmtOffset = '+0200';
+       }
+
+       $timezone = new DateTimeZone($gmtOffset);
+       $datetime = new DateTime();
+
+       $datetime->setTimestamp($value);
+       $datetime->setTimezone($timezone);
+
+       $datetime_str = $datetime->format($timestamp_format);
+
+
+       return $datetime_str;
     }
 }
