@@ -24,9 +24,9 @@ class PropertyModifierConvertUnixTimestamp extends PropertyModifierHook
         $form->addElement('text', 'timezone', array(
             'label'       => 'GMT',
             'description' => $form->translate(
-                'Define the Timezone. Default is +0200'
+                'Define the Timezone. List of possible timezones https://www.w3schools.com/php/php_ref_timezones.asp. Default is Europe/Berlin'
             ),
-	    'value'	  => '+0200',
+	    'value'	  => 'Europe/Berlin',
             'required'    => false,
         ));
 
@@ -70,7 +70,7 @@ class PropertyModifierConvertUnixTimestamp extends PropertyModifierHook
        }
 
        if (!isset($gmtOffset) or $gmtOffset == '') {
-           $gmtOffset = '+0200';
+           $gmtOffset = 'Europe/Berlin';
        }
 
        $timezone = new DateTimeZone($gmtOffset);
